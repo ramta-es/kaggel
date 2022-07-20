@@ -1,59 +1,37 @@
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader, Subset
-import argparse
-from pathlib import Path
+from torch.utils.data import Dataset
 
-import imgaug
-from collections import defaultdict
-import imgaug.augmenters as iaa
-import random
-import torch
-import hs.data_processing as hsu
+from mri_object import Mri_Object
 
-df = pd.read_csv('/Users/ramtahor/Desktop/projects/kaggel/dataset/uw-madison-gi-tract-image-segmentation/train.csv')
-img_root = 'dataset/uw-madison-gi-tract-image-segmentation/train'
+im_root = 'dataset/uw-madison-gi-tract-image-segmentation'
+csv_path = '/Users/ramtahor/Desktop/projects/kaggel/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
+
 
 class MriDataset(Dataset):
-    def __init__(self, images_root, csv_path):
-        self.seg_df = pd.read_csv(csv_path)
-        self.images = images
-        self.labels = self.seg_df['class']
+    def __init__(self, im_root, csv_path):
+        self.df = pd.read_csv(csv_path)
+        self.df = self.df.set_index('id')
+        self.images = []
+        self.masks = []
+        for file in Path(im_root).glob('*/*/*/*/*.png'):
+            self.img = Mri_Object(df=self.df, im_path=file, sep='_')
+            self.images.append(self.img.image)
+            self.masks.append(self.img.create_mask_images())
+        self.images = np.array(self.images)
+        self.masks = np.array(self.masks)
 
     def __len__(self):
         return self.images.shape[0]
 
     def __getitem__(self, idx):
-        image_tensor = 0
-        label_tensor = 0
-        return image_tensor, label_tensor
+        return self.images[idx], self.masks[idx]
 
     def get_dataloaders(self, batch_size, train_split=0.8):
         pass
 
-    def rleToMask(self, rleString, height, width):
-        rows, cols = height, width
-        rleNumbers = [int(numstring) for numstring in rleString.split(' ')]
-        rlePairs = np.array(rleNumbers).reshape(-1, 2)
-        img = np.zeros(rows * cols, dtype=np.uint8)
-        for index, length in rlePairs:
-            index -= 1
-            img[index:index + length] = 255
-        img = img.reshape(cols, rows)
-        img = img.T
-        return img
-
-    def get_images_and_labels(self, img_path, csv_path):
-        im_list = []
-        label_list = []
-        label = {'class': 0, 'number': 1, 'date': 2}
-        for file in Path(img_root).glob('*/*.png'):
-            image = np.load(str(file))[:, :, band]
-            image = img(images=(image.reshape(image.shape[2], image.shape[0], image.shape[1])))
-            im_list.append(image.astype(np.float32))
-            label_list.append(int(((str(file).split('.npy')[0]).split('class-')[1]).split('_')[i]))
-        return np.array(im_list), np.array(label_list)
 
 # if __name__ == '__main__':
 #     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
