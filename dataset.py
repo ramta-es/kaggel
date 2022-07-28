@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from mri_object import Mri_Object
 
 im_root = 'dataset/uw-madison-gi-tract-image-segmentation'
-csv_path = '/Users/ramtahor/Desktop/projects/kaggel/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
+csv_path = '/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
 
 
 class MriDataset(Dataset):
