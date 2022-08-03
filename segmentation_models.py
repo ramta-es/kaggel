@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# UNET model:
 
 class DoubleConv(nn.Module):
     """(convolution => [BN] => ReLU) * 2"""
@@ -126,3 +127,6 @@ class UNet(nn.Module):
         print('changing n classes to', new_n_classes)
         self.n_classes = new_n_classes
         self.outc = OutConv(self.scale_channels, new_n_classes)
+# # # # # # # # # # # # # # # # #
+
+# model:

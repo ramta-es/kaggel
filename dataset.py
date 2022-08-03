@@ -1,13 +1,14 @@
 from pathlib import Path
-
+from torch.utils.data import Dataset, DataLoader, Subset
 import numpy as np
 import pandas as pd
-from torch.utils.data import Dataset
+import matplotlib.pyplot as plt
 
 from mri_object import Mri_Object
 
 im_root = 'dataset/uw-madison-gi-tract-image-segmentation'
 csv_path = '/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
+csv_path = '/Users/ramtahor/Desktop/projects/kaggel/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
 
 
 class MriDataset(Dataset):
@@ -20,6 +21,9 @@ class MriDataset(Dataset):
             self.img = Mri_Object(df=self.df, im_path=file, sep='_')
             self.images.append(self.img.image)
             self.masks.append(self.img.create_mask_images())
+            if len(self.images) > 10:
+                break
+
         self.images = np.array(self.images)
         self.masks = np.array(self.masks)
 
@@ -29,8 +33,16 @@ class MriDataset(Dataset):
     def __getitem__(self, idx):
         return self.images[idx], self.masks[idx]
 
+
     def get_dataloaders(self, batch_size, train_split=0.8):
-        pass
+        idx = np.arange(len(self.images))
+        train_size = int(len(self.images) * train_split)
+        train_idx = idx[:train_size]
+        val_idx = idx[train_size:]
+        train_dl = DataLoader(dataset=Subset(self, indices=train_idx), shuffle=True, batch_size=batch_size)
+        val_dl = DataLoader(dataset=Subset(self, indices=val_idx), batch_size=batch_size)
+        return train_dl, val_dl
+
 
 
 # if __name__ == '__main__':
@@ -53,6 +65,6 @@ class MriDataset(Dataset):
 # )
 
 # dataset = MriDataset(root=args.root, csv_path=args.csv_file)
-dataset = MriDataset()
-x = dataset[2]
-# csv_file = pd.read_csv()
+dataset = MriDataset(im_root, csv_path)
+# x = dataset[2][1].shape
+# print('shape', x)

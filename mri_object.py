@@ -16,24 +16,27 @@ class Mri_Object(object):
         self.df = self.df.set_index('class')
         self.label_dict = {'small_bowel': 1, 'large_bowel': 2, 'stomach': 3}
 
-        self.image = np.array(imageio.imread(self.path))
+        self.image = np.array(imageio.imread(self.path)).astype(np.float64)
+        self.image = self.image[np.newaxis, :, :]
+        print('image shape', self.image.shape)
 
     def create_mask_images(self):
 
-        mask = np.zeros((self.image.shape[0], self.image.shape[1]))
+        mask = np.zeros((self.image.shape[1], self.image.shape[2]))
 
         for label, row in self.df.iterrows():
             if type(self.df.at[label, 'segmentation']) != float:
-                mask2 = self.rleToMask((self.df.at[label, 'segmentation']), self.image.shape[0],
-                                       self.image.shape[1], self.label_dict[label])
-
-                mask = np.maximum(mask, mask2)
+                mask2 = self.rleToMask((self.df.at[label, 'segmentation']), self.image.shape[1],
+                                       self.image.shape[2], self.label_dict[label])
+                print('mask', mask.shape)
+                print('mask2', mask2.shape)
+                mask = np.maximum(mask, mask2.T)
 
             else:
 
                 continue
 
-        return mask
+        return mask.T[np.newaxis, :, :]
 
     @staticmethod
     def rleToMask(rleString, height, width, val):
