@@ -1,34 +1,15 @@
-from torchvision import models
 from torch.optim import Adam
 import torch.nn as nn
 import time as time
-import torch
-from dataset import MriDataset
-from segmentation_models import UNet
-
-from torch_trainer.general_utils import read_yaml, get_class
-from torch_trainer.configuration_objects import TrainingConfiguration
-from torch_trainer.traces import Trace
+from datasets_objects.datasets import MriDataset
+from models.segmentation_models import UNet
 
 import torch
-import os
-from shutil import rmtree
-from datetime import datetime
-from time import sleep
-from torch.utils.tensorboard import SummaryWriter
-from typing import List
-import yaml
-from tqdm import tqdm, trange
-from collections import OrderedDict
-import numpy as np
-import cv2
-import signal
-from pathlib import Path
 
 im_root = 'dataset/uw-madison-gi-tract-image-segmentation'
 csv_path = '/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
-csv_path = '/Users/ramtahor/Desktop/projects/kaggel/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
-config_path = '/Users/ramtahor/Desktop/projects/kaggel/torch_trainer/example_config_files/unet_model.yaml'
+csv_path = '/dataset/uw-madison-gi-tract-image-segmentation/train.csv'
+config_path = '/torch_trainer/example_config_files/unet_model.yaml'
 
 
 class Trainer():

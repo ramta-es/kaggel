@@ -176,7 +176,7 @@ class TorchTrainer:
     def init_measurements_obj(self, loss_names):
         """create helper objects in order to make the train function more clear"""
         train_loaders, test_loaders = self.dataset.get_data_loaders(self.cfg.model.batch_size)
-        train = measurementObj(loaders=train_loaders, writer_path=os.path.join(self.root, 'train'), losses_names=loss_names)
+        train = measurementObj(loaders=train_loaders, writer_path=os.path.join(self.root, ''), losses_names=loss_names)
         test = measurementObj(loaders=test_loaders, writer_path=os.path.join(self.root, 'test'),
                               measurements=self.cfg.model.test_traces, losses_names=loss_names)
         return train, test
